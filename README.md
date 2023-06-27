@@ -3,6 +3,9 @@
 
 Experimental app built for finding scope & style for 3rd semester programming & Systems development @ EASV.
 
+Get a postgres plan at ElephantSQL: https://www.elephantsql.com 
+and add the connectionstring from ElephantSQL as environment variable (with name pgconn). Also add a environment variable secret for jwt with name dotnetsecret. (If you want to run locally)
+
 Key decisions:
 
 - Postgres as DB due to its open source nature, rich features, community and abundance of cloud vendors
