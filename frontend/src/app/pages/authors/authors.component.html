@@ -1,0 +1,25 @@
+
+
+<ion-content [fullscreen]="true">
+  <ion-card *ngFor="let a of []">
+    <ion-card-header>
+      <ion-card-title></ion-card-title>
+      <ion-card-subtitle>by {{a | json}}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <!-- TODO STEP 1: MAKE UI FOR DISPLAYING / MODIFYING DATA -->
+        <ion-item >
+          <ion-thumbnail slot="start">
+            <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
+          </ion-thumbnail>
+          <ion-label></ion-label>
+        </ion-item>
+
+
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+<ion-searchbar [formControl]="formService.searchAuthorsPreferencesFormData.authorSearchTerm" animated="true" placeholder="Search for an author"></ion-searchbar>

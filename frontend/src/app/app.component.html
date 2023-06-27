@@ -1,0 +1,23 @@
+<ion-app>
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons>
+        <ion-button (click)="location.back()">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title>The library sample app📚</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="helper.logout()">
+          <ion-icon name="log-out-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="location.forward()">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-router-outlet style="margin-top: 50px;"></ion-router-outlet>
+
+</ion-app>

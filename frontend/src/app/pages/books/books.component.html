@@ -1,0 +1,38 @@
+<ion-content>
+
+
+  <div *ngIf="formService.searchBooksPreferencesFormData.bookSearchTerm.value!=''">
+    <ion-toolbar color="transparent"><ion-title>Search results for "{{formService.searchBooksPreferencesFormData.bookSearchTerm.value}}"</ion-title></ion-toolbar>
+    <app-book-card *ngFor="let book of state.books" [book]="book"></app-book-card>
+  </div>
+
+  <div  *ngIf="formService.searchBooksPreferencesFormData.bookSearchTerm.value==''">
+    <ion-toolbar color="transparent"><ion-title>Not on your reading list</ion-title></ion-toolbar>
+    <div style="display: flex;
+    overflow-x: auto;
+    white-space: nowrap;">
+      <app-book-card *ngFor="let book of state.discoverFeed.notOnReadingList" [book]="book"></app-book-card>
+    </div>
+
+    <ion-toolbar color="transparent"><ion-title>Recently added books</ion-title></ion-toolbar>
+
+    <div style="display: flex;
+    overflow-x: auto;
+    white-space: nowrap;">
+
+      <app-book-card *ngFor="let book of state.discoverFeed.recentlyAdded" [book]="book"></app-book-card>
+
+    </div>
+  </div>
+
+</ion-content>
+
+
+<ion-item lines="none">
+  <ion-searchbar animated="true" (ionInput)="bookService.getBooks()" [formControl]="formService.searchBooksPreferencesFormData.bookSearchTerm"
+                 placeholder="Search for a book"></ion-searchbar>
+  <ion-button expand="block" (click)="openModal()">
+    <ion-icon name="cog-outline"></ion-icon>
+    Preferences
+  </ion-button>
+</ion-item>

@@ -1,0 +1,17 @@
+<ion-content [fullscreen]="true">
+
+  <ion-card *ngIf="state.currentBook as book">
+    <ion-toolbar>
+      <ion-title>{{book.title}}</ion-title>
+      <ion-title></ion-title>
+    </ion-toolbar>
+    <img style="height: 250px; width: auto;" [src]="state.currentBook.coverImgUrl || 'https://ionicframework.com/docs/img/demos/thumbnail.svg'">
+
+  <ion-item>
+    <ion-input label="add author"></ion-input>
+  </ion-item>
+
+
+    <ion-button *ngIf="state.accountProfileData.role=='admin'" (click)="bookService.deleteBook(book.bookId, false)">Delete book</ion-button>
+  </ion-card>
+</ion-content>

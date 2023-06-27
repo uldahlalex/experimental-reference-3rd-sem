@@ -1,0 +1,1554 @@
+{
+	"info": {
+		"_postman_id": "5e29f7c2-6114-4b20-b5b8-dc011bc613e6",
+		"name": "Library API Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8913011"
+	},
+	"item": [
+		{
+			"name": "POST /register",
+			"item": [
+				{
+					"name": "bad email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"",
+									"pm.test(\"Response is 400 bad request\", () => {",
+									"pm.expect(pm.response.code).equal(400);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{$randomStreetName}}\",\n    \"password\": \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "already exists",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt', response.json().jwt);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"",
+									"pm.test('Status code should be 400 bad request', () => {",
+									"pm.expect(pm.response.code).equal(400);",
+									"})",
+									"",
+									"const deleteUserAfterRequest = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/deleteSignedInUser',",
+									"  method: 'DELETE',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"    'Authorization': pm.variables.get('jwt')",
+									"  }",
+									"};",
+									"pm.sendRequest(deleteUserAfterRequest, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response code is 201\", () => {",
+									"  pm.expect(pm.response.code).equal(201);",
+									"})",
+									"",
+									"pm.test(\"Has valid token with email \"+pm.variables.get('email'), () => {",
+									"    let body = pm.response.json();",
+									"    let decoded = (atob(body.responseData))",
+									"",
+									"",
+									"    pm.expect(decoded).to.include(\"user\");",
+									"    pm.expect(decoded).to.include(\"active\");",
+									"    pm.expect(decoded).to.include(\"endUserId\");",
+									"    pm.expect(decoded).to.include(pm.variables.get('email'));",
+									"",
+									"});",
+									"",
+									"",
+									"const deleteUserAfterRequest = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/deleteSignedInUser',",
+									"  method: 'DELETE',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"    'Authorization': pm.variables.get('jwt')",
+									"  }",
+									"};",
+									"pm.sendRequest(deleteUserAfterRequest, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "short pass",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response code is 400\", () => {",
+									"",
+									"  pm.expect(pm.response.code).equal(400);",
+									"})",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0IiwiZW1haWwiOiJhbGV4QHVsZGFobC5jb20iLCJyb2xlIjoidXNlciIsIm5iZiI6MTY4NDY4MTAwMSwiZXhwIjoxNzE2MzAzNDAxLCJpYXQiOjE2ODQ2ODEwMDF9.b7vvn2XKsrgfJL2F1j1I4sUHPn8PBKo-cXWS7bCKd5w",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@shortpass.dk\",\n    \"password\": \"123\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POST /login",
+			"item": [
+				{
+					"name": "success",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().jwt);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('successfull login with email '+pm.variables.get('email'), () => {",
+									"pm.expect(pm.response.code).equal(200);",
+									"})",
+									"",
+									"",
+									"const deleteUserAfterRequest = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/deleteSignedInUser',",
+									"  method: 'DELETE',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"    'Authorization': pm.variables.get('jwt')",
+									"  }",
+									"};",
+									"pm.sendRequest(deleteUserAfterRequest, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invalid credentials",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", () => {",
+									" pm.expect(pm.response.code).equal(400);",
+									"})",
+									"",
+									"const deleteUserAfterRequest = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/deleteSignedInUser',",
+									"  method: 'DELETE',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"    'Authorization': pm.variables.get('jwt')",
+									"  }",
+									"};",
+									"pm.sendRequest(deleteUserAfterRequest, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"12345671\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "not existant",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User does not exist, 404 status code\", () => {",
+									"pm.expect(pm.response.code).equal(404);",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POST /books",
+			"item": [
+				{
+					"name": "success",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"pm.variables.set('num', Math.floor(Math.random()*50)+1);",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const deleteUserAfterRequest = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/deleteSignedInUser',",
+									"  method: 'DELETE',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"    'Authorization': pm.variables.get('jwt')",
+									"  }",
+									"};",
+									"pm.sendRequest(deleteUserAfterRequest, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"})",
+									"",
+									"pm.test(\"Response status code is 201\", () => {",
+									" pm.expect(pm.response.code).equal(201);",
+									"})",
+									"",
+									"//optional cleanup: delete book after request"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"book1\",\n    \"publisher\": \"publisher1\",\n    \"coverImgUrl\": \"https://picsum.photos/{{num}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"books"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GET /books",
+			"item": [
+				{
+					"name": "success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var _ = require('lodash');",
+									"pm.test('Sort using lodash', () => {",
+									"    var expectedSortedOrder = _.orderBy(pm.response.json().responseData, ['title'],['asc']);",
+									"    pm.expect(pm.response.json().responseData).to.eql(expectedSortedOrder);    ",
+									"});",
+									"",
+									"pm.test(\"Books have necessary properties\", function () {",
+									"    var jsonData = pm.response.json().responseData;",
+									"    jsonData.forEach(function(book) {",
+									"        pm.expect(book).to.have.property('isOnMyReadingList');",
+									"        pm.expect(book).to.have.property('title');",
+									"        pm.expect(book).to.have.property('authors');",
+									"      ",
+									"    });",
+									"});",
+									"",
+									"",
+									"const deleteUserAfterRequest = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/deleteSignedInUser',",
+									"  method: 'DELETE',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"    'Authorization': pm.variables.get('jwt')",
+									"  }",
+									"};",
+									"pm.sendRequest(deleteUserAfterRequest, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/books?bookSearchTerm=asd&orderBy=books.title&pageSize=2&startAt=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"books"
+							],
+							"query": [
+								{
+									"key": "bookSearchTerm",
+									"value": "asd"
+								},
+								{
+									"key": "orderBy",
+									"value": "books.title"
+								},
+								{
+									"key": "pageSize",
+									"value": "2"
+								},
+								{
+									"key": "startAt",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "bad params parameter binding",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 because parameter binding failed\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/books?bookSearchTerm=b&orderBy=title&pageSize=somestring&startAt=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"books"
+							],
+							"query": [
+								{
+									"key": "bookSearchTerm",
+									"value": "b"
+								},
+								{
+									"key": "orderBy",
+									"value": "title"
+								},
+								{
+									"key": "pageSize",
+									"value": "somestring"
+								},
+								{
+									"key": "startAt",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "bad params order",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400 because ordering is none of valid options\", function () {",
+									"  pm.expect(pm.response.code).equal(400);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/books?bookSearchTerm=basdsadadsadsadsadsa&orderBy=titletitletitletitleteitel&pageSize=5&startAt=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"books"
+							],
+							"query": [
+								{
+									"key": "bookSearchTerm",
+									"value": "basdsadadsadsadsadsa"
+								},
+								{
+									"key": "orderBy",
+									"value": "titletitletitletitleteitel"
+								},
+								{
+									"key": "pageSize",
+									"value": "5"
+								},
+								{
+									"key": "startAt",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "GET /myReadingList",
+			"item": [
+				{
+					"name": "success",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", () => {",
+									"    pm.expect(pm.response.code).equal(200);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/myReadingList",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"myReadingList"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POST /addToMyReadingList/book/{{bookId}}",
+			"item": [
+				{
+					"name": "success",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"",
+									"const createBook = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/books/',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json',",
+									"    'Authorization': pm.variables.get('jwt')",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ title: 'mockbook', publisher: 'mock publisher', coverImgUrl: \"https://picsum.photos/\"+Math.floor(Math.random*50)+1})",
+									"  }",
+									"};",
+									"pm.sendRequest(createBook, (error, response) => {",
+									"  var resp = (error ? error : response.json());",
+									"  pm.variables.set('bookId', resp.responseData.bookId);",
+									"})",
+									"",
+									"",
+									"",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"201 response\", () => {",
+									"pm.expect(pm.response.code).equal(201);",
+									"})",
+									"",
+									"",
+									"const deleteRequest = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/deleteSignedInUser',",
+									"  method: 'DELETE',",
+									"    header: {",
+									"    'Authorization': pm.variables.get('jwt')",
+									"  },",
+									"};",
+									"pm.sendRequest(deleteRequest, (error, response) => {",
+									"  var resp = (error ? error : response.json());",
+									"",
+									"})",
+									"",
+									"//optional: delete book"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/addToMyReadingList/book/{{bookId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"addToMyReadingList",
+								"book",
+								"{{bookId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GET /authors",
+			"item": [
+				{
+					"name": "success",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/authors?authorSearchTerm=a&orderBy=name&pageSize=10&startAt=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authors"
+							],
+							"query": [
+								{
+									"key": "authorSearchTerm",
+									"value": "a"
+								},
+								{
+									"key": "orderBy",
+									"value": "name"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								},
+								{
+									"key": "startAt",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "bad params",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/authors?authorSearchTerm&orderBy=name&pageSize=10&startAt=blah",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authors"
+							],
+							"query": [
+								{
+									"key": "authorSearchTerm",
+									"value": null
+								},
+								{
+									"key": "orderBy",
+									"value": "name"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								},
+								{
+									"key": "startAt",
+									"value": "blah"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POST /authors",
+			"item": []
+		},
+		{
+			"name": "PUT /avatar",
+			"item": [
+				{
+					"name": "http://localhost:5000/api/avatar",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('201 response', () => {",
+									"    pm.expect(pm.response.code).equal(201);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json, text/plain, */*"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en-US,en;q=0.9,da;q=0.8"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}"
+							},
+							{
+								"key": "Connection",
+								"value": "keep-alive"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Origin",
+								"value": "http://localhost:4200"
+							},
+							{
+								"key": "Referer",
+								"value": "http://localhost:4200/"
+							},
+							{
+								"key": "Sec-Fetch-Dest",
+								"value": "empty"
+							},
+							{
+								"key": "Sec-Fetch-Mode",
+								"value": "cors"
+							},
+							{
+								"key": "Sec-Fetch-Site",
+								"value": "same-site"
+							},
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "sec-ch-ua",
+								"value": "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\""
+							},
+							{
+								"key": "sec-ch-ua-mobile",
+								"value": "?0"
+							},
+							{
+								"key": "sec-ch-ua-platform",
+								"value": "\"Linux\""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"pravatarId\":66}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/avatar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"avatar"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GET /discover",
+			"item": [
+				{
+					"name": "New Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"code is not 200\", () => {",
+									"    pm.expect(pm.response.code).equal(200);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+									"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+									"",
+									"",
+									"const createUser = {",
+									"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+									"  method: 'POST',",
+									"  header: {",
+									"    'Content-Type': 'application/json'",
+									"  },",
+									"  body: {",
+									"    mode: 'raw',",
+									"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+									"  }",
+									"};",
+									"pm.sendRequest(createUser, (error, response) => {",
+									"  console.log(error ? error : response.json());",
+									"  pm.variables.set('jwt',response.json().responseData);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/discover/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"discover",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "No route match",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/yada",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"yada"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth problems",
+			"item": [
+				{
+					"name": "No auth header present",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/myReadingList",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"myReadingList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Broken token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbRVc2VySWQiOiIzNCIsInJvbGUiOiJ1c2VyIiwic3RhdHVzIjoiYWN0aXZlIiwiZW1haWwiOiJSb3kuV2Vpc3NuYXQzNUBnbWFpbC5jb20iLCJwcmF2YXRhcklkIjoiMCIsIm5iZiI6MTY4NzgwNDY3MiwiZXhwIjoxNzE5NDI3MDcyLCJpYXQiOjE2ODc4MDQ2NzJ9.vlTZ_PI4pzLImWJd6YGHUduxzDms9L6IFxwx6RaeHvM",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/myReadingList",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"myReadingList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Auth header empty",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/myReadingList",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"myReadingList"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var randomEmail = pm.variables.replaceIn('{{$randomEmail}}') //gets a random email from fakerjs",
+					"pm.variables.set('email', randomEmail);  //sets the random email to an email variable",
+					"",
+					"//For this request to always be successfull, there must be an active user to ",
+					"//add a valid book not already on their reading list, so this is what this script calls",
+					"const createUser = {",
+					"  url: pm.collectionVariables.get('baseUrl')+'/register',",
+					"  method: 'POST',",
+					"  header: {",
+					"    'Content-Type': 'application/json',",
+					"    ",
+					"  },",
+					"  body: {",
+					"    mode: 'raw',",
+					"    raw: JSON.stringify({ email: pm.variables.get('email'), password: '12345678'})",
+					"  }",
+					"};",
+					"pm.sendRequest(createUser, (error, response) => {",
+					"  var resp = (error ? error : response.json());",
+					"  console.log(resp.responseData)",
+					"    pm.variables.set('jwt', resp.responseData)",
+					"});"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"/*pm.test(\"Content-Type header is application/json\", () => {",
+					"  pm.expect(pm.response.headers.get('Content-Type')).to.contain('application/json');",
+					"});",
+					"",
+					"pm.test(\"Message exists on the response body\", () => {",
+					"    var resp = pm.response.json();",
+					"  pm.expect(resp.message).length.greaterThan(0);",
+					"});",
+					"*/"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		}
+	]
+}

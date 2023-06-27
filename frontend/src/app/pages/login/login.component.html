@@ -1,0 +1,36 @@
+<ion-content>
+  <ion-grid *ngIf="state.accountProfileData?.endUserId==undefined" class="ion-padding">
+    <ion-card>
+      <ion-toolbar>
+        <ion-title>
+          Please sign in to continue
+        </ion-title>
+      </ion-toolbar>
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-input label="email" label-placement="floating" [formControl]="formService.authFormData.email"
+                       type="email" placeholder="Your email here">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-input label="password" labelPlacement="floating" [formControl]="formService.authFormData.password"
+                       type="password"
+                       placeholder="Your password here"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col style="text-align: center;">
+          <ion-button (click)="logIn()" fill="outline">Log in</ion-button>
+          <ion-button (click)="auth.register()" fill="outline" color="warning">Register</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-card>
+  </ion-grid>
+</ion-content>

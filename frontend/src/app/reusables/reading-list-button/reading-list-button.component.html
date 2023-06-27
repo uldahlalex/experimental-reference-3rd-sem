@@ -1,0 +1,10 @@
+<ion-label *ngIf="book.isOnMyReadingList!=undefined">
+  <ion-button (click)="readingListService.addToReadingList(book)" color="secondary" fill="outline"
+              *ngIf="book.isOnMyReadingList!=true">Add to reading list
+    <ion-icon name="heart-outline"></ion-icon>
+  </ion-button>
+  <ion-button (click)="readingListService.removeFromReadingList(book)" color="secondary" fill="outline"
+              *ngIf="book.isOnMyReadingList==true">Remove from reading list
+    <ion-icon name="heart-dislike-outline"></ion-icon>
+  </ion-button>
+</ion-label>
