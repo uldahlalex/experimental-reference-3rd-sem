@@ -33,6 +33,7 @@ public class GlobalExceptionMiddleware
     private static Task HandleExceptionAsync(HttpContext http, Exception exception, ILogger<GlobalExceptionMiddleware> logger)
     {
         http.Response.ContentType = "application/json";
+        logger.LogError(exception, "{ExceptionMessage}", exception.Message);
 
         if (exception is ValidationException ||
             exception is ArgumentException ||
@@ -58,13 +59,13 @@ public class GlobalExceptionMiddleware
                  exception is NotImplementedException)
         {
             http.Response.StatusCode = StatusCodes.Status501NotImplemented;
+            return http.Response.WriteAsJsonAsync(new { messageToClient = "Unable to process request" });
         }
         else
         {
             http.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            return http.Response.WriteAsJsonAsync(new { messageToClient = "Unable to process request" });
         }
-
-        logger.LogError(exception, "{ExceptionMessage}", exception.Message);
         return http.Response.WriteAsJsonAsync(new ResponseDto(exception.Message));
     }
 }
