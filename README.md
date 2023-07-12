@@ -17,5 +17,6 @@ Key decisions:
 - Only explicit middleware added is CORS, Exception handling, and route checking (and of course controller mapping)
 - Also a static file server for Angular (only one deployment needed)
 - This sample also features authentication, although this is outside the scope of the programming course
+- Relatively few libraries and dependencies
 
 
