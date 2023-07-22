@@ -6,6 +6,15 @@ namespace Service;
 
 public class PasswordHashAlgorithm
 {
+    private readonly byte[] _pepper;
+
+    public PasswordHashAlgorithm()
+    {
+        var pepper = Environment.GetEnvironmentVariable("pepper");
+        if (pepper == null) throw new InvalidOperationException("Missing \'pepper\' in environment variables!");
+        _pepper = Encoding.UTF8.GetBytes(pepper);
+    }
+
     public string GenerateSalt()
     {
         return Encode(RandomNumberGenerator.GetBytes(128));
@@ -19,6 +28,7 @@ public class PasswordHashAlgorithm
             MemorySize = 12288,
             Iterations = 3,
             DegreeOfParallelism = 1,
+            KnownSecret = _pepper
         };
         return Encode(hashAlgo.GetBytes(256));
     }
