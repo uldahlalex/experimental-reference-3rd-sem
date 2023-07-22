@@ -20,7 +20,7 @@ public class PasswordHashAlgorithm
         return Encode(RandomNumberGenerator.GetBytes(128));
     }
 
-    public String HashPassword(string password, String salt)
+    public string HashPassword(string password, string salt)
     {
         using var hashAlgo = new Argon2id(Encoding.UTF8.GetBytes(password))
         {
@@ -33,7 +33,7 @@ public class PasswordHashAlgorithm
         return Encode(hashAlgo.GetBytes(256));
     }
 
-    public bool VerifyHashedPassword(string password, string hash, string salt)
+    public bool VerifyHashedPassword(string password, string salt, string hash)
     {
         return HashPassword(password, salt).SequenceEqual(hash);
     }
