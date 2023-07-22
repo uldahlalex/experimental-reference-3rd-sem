@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Authentication;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using Infrastructure.DataModels;
 using Infrastructure.Repositories;
@@ -14,12 +13,14 @@ namespace Service;
 public class AuthenticationService
 {
     private readonly UserRepository _userRepository;
+    private readonly PasswordHashAlgorithm _passwordHashAlgorithm;
 
     private static readonly byte[] Secret = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("dotnetsecret")!);
 
-    public AuthenticationService(UserRepository userRepository)
+    public AuthenticationService(UserRepository userRepository, PasswordHashAlgorithm passwordHashAlgorithm)
     {
         _userRepository = userRepository;
+        _passwordHashAlgorithm = passwordHashAlgorithm;
     }
 
     public void PrintWarningIfSecretIsNotValid()
@@ -131,7 +132,7 @@ public class AuthenticationService
         EndUser endUser = _userRepository.GetUserByEmailOrNull(email);
         if (ReferenceEquals(endUser, null)) throw new KeyNotFoundException("User does not exist");
 
-        if (!BCrypt.Net.BCrypt.Verify(password + endUser.Salt, endUser.PasswordHash))
+        if (!_passwordHashAlgorithm.VerifyHashedPassword(password, endUser.Salt!, endUser.PasswordHash!))
         {
             throw new InvalidCredentialException("Wrong email and password");
         }
@@ -146,8 +147,8 @@ public class AuthenticationService
             throw new ValidationException("Email is already taken");
         }
 
-        string salt = RandomNumberGenerator.GetBytes(32).ToString()!;
-        string hash = BCrypt.Net.BCrypt.HashPassword(password + salt);
+        string salt = _passwordHashAlgorithm.GenerateSalt();
+        string hash = _passwordHashAlgorithm.HashPassword(password, salt);
 
         return _userRepository.CreateAndReturnUser(email, salt, hash, role);
     }

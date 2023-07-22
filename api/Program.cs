@@ -37,6 +37,7 @@ builder.Services.AddSingleton<AuthorService>();
 builder.Services.AddSingleton<BookService>();
 builder.Services.AddSingleton<AuthenticationService>();
 builder.Services.AddSingleton<ResponseHelper>();
+builder.Services.AddSingleton<PasswordHashAlgorithm>();
 
 
 //MIDDLEWARE
