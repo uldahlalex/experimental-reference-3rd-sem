@@ -1,21 +1,33 @@
 using System.Security.Cryptography;
+using System.Text;
+using Konscious.Security.Cryptography;
 
 namespace Service;
 
 public class PasswordHashAlgorithm
 {
-    public string HashPassword(string password, string salt)
-    {
-        return BCrypt.Net.BCrypt.HashPassword(password + salt);
-    }
-
-    public bool VerifyHashedPassword(string password, string salt, string hash)
-    {
-        return BCrypt.Net.BCrypt.Verify(password + salt, hash);
-    }
-
     public string GenerateSalt()
     {
-        return RandomNumberGenerator.GetBytes(32).ToString()!;
+        return Encode(RandomNumberGenerator.GetBytes(128));
     }
+
+    public String HashPassword(string password, String salt)
+    {
+        using var hashAlgo = new Argon2id(Encoding.UTF8.GetBytes(password))
+        {
+            Salt = Decode(salt),
+            MemorySize = 12288,
+            Iterations = 3,
+            DegreeOfParallelism = 1,
+        };
+        return Encode(hashAlgo.GetBytes(256));
+    }
+
+    public bool VerifyHashedPassword(string password, string hash, string salt)
+    {
+        return HashPassword(password, salt).SequenceEqual(hash);
+    }
+
+    private byte[] Decode(string value) => Convert.FromBase64String(value);
+    private string Encode(byte[] value) => Convert.ToBase64String(value);
 }
