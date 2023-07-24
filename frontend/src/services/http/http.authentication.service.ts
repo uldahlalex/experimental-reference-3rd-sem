@@ -9,7 +9,7 @@ import {AuthResponseDTO, BaseResponseDTO,} from "../../models/responseDTOs";
 import {environment} from "../../environments/environment";
 import {FormService} from "../form.service";
 import {Router} from "@angular/router";
-
+import {withJwt} from "./http.utils";
 
 @Injectable({
   providedIn: 'root'
@@ -66,11 +66,14 @@ export class AuthenticationService {
 
   async verifyTokenIntegrity() {
     try {
-      const data = (await axios.get<AuthResponseDTO>(environment.baseUrl + '/verifyTokenIntegrity', {
-        headers: {
-          Authorization: localStorage.getItem('jwt')
-        }
-      })).data;
+      const data = (await axios.get<AuthResponseDTO>(environment.baseUrl + '/verifyTokenIntegrity',
+        withJwt()
+      )).data;
+      // const data = (await axios.get<AuthResponseDTO>(environment.baseUrl + '/verifyTokenIntegrity', {
+      //   headers: {
+      //     Authorization: localStorage.getItem('jwt')
+      //   }
+      // })).data;
       localStorage.setItem('jwt', data.responseData);
       this.state.accountProfileData = jwtDecode(data.responseData) as AccountProfileData;
       //this.helper.toast('Welcome back', 'primary', 1000, "top")
