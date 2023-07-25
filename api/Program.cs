@@ -1,4 +1,5 @@
-﻿using api.ActionFilters;
+﻿using System.Net;
+using api.ActionFilters;
 using api.Helpers;
 using api.Middleware;
 using Infrastructure;
@@ -55,16 +56,28 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSwaggerGen();
 }
 
-var app = builder.Build();
-
-app.UseCors(options =>
+builder.Services.AddHsts(options =>
 {
-    options.SetIsOriginAllowed(origin => true)
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
+    options.Preload = true;
+    options.IncludeSubDomains = true;
+    // Increase to a year after testing in production
+    options.MaxAge = TimeSpan.FromMinutes(5);
 });
 
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
+});
+
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseSecurityHeaders();
 
 app.UseSpaStaticFiles(new StaticFileOptions()
 {

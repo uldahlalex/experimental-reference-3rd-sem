@@ -1,0 +1,281 @@
+{
+	"info": {
+		"_postman_id": "7b4cc0aa-b237-4110-9fad-94aba48d47c5",
+		"name": "Check for Common API Vulnerabilities",
+		"description": "## What does this collection do?\nThis collection will check your APIs for the following things:\n###### Security Vulnerabilities\n- [CORS Misconfigurations](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)\n- [Directory Traversal](https://portswigger.net/web-security/file-path-traversal)\n- [SQL Injection](https://portswigger.net/web-security/sql-injection)\n- [Authentication](https://portswigger.net/web-security/authentication)\n\n###### Security Headers\n- [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)\n- [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options)\n- [Strict-Transport-Security](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security)\n- [X-XSS-Protection](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection)\n\n###### [Content Secure Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)\n\n## Requirements\nDefine the following Variables in the **Check for Common API Vulnerabilities** environment.\n\n- API's base URL you want to test in the `base_url` variable\n- Suspicious or Foreign Origin for which you want to test in `malicious_origin` variable\n- Add unauthorised subdomain URL in the `sub_domain_url` variable\n- Key name that will contain the access token in `access_token_key` variable, default is `x-access-token` \n- Valid access token to access the API in `valid_access_token_value ` variable\n- Expired access token in `expired_access_token_value ` variable\n- Other User's valid access token in `other_user_access_token_value` variable\n- The key that is used to send user id OR name in the `param_key` variable\n- The value in the `param_value` variable for the **key** mentioned in the `param_key`\n\n## Using the Collection\nOnce configured, run the collection within the `Runner` with the relevant environment selected.\n\n## Results\nAt the end of the run, you'll get the test results. Failed tests could mean that the API is vulnerable to an attack. Check out the `Visualize` tab to learn more about the test results.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CORS Misconfiguration",
+			"item": [
+				{
+					"name": "Basic Origin Reflection Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"checks vulnerability with basic origin reflection\", function() {",
+									"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(pm.variables.get(\"malicious_origin\"))",
+									"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Credentials\")).to.be.oneOf([undefined,'false'])",
+									"});",
+									"",
+									"let template = `",
+									"<div style=\"align-items:center;display:flex;justify-content:center;margin:16px 32px;\">",
+									"  <div style=\"padding:16px; font-family:Inter, OpenSans, Helvetica, Arial, sans-serif; border:1px solid #ccc; text-align:center; vertical-align:middle; border-radius:8px;background-color:#f2f2f2\">",
+									"    <span >{{text}}</span/>",
+									"    <br/>",
+									"    <span>Learn more at <u>{{link}}</u></span>",
+									"  </div>",
+									"  </div>",
+									"  `;",
+									"  pm.visualizer.set(template, {",
+									"    text:",
+									"      'If this test fails then it means that maybe any domain can access resources or sensitive information from your domain',",
+									"      link:\"https://portswigger.net/web-security/cors\"",
+									"  });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Origin",
+								"value": "{{malicious_origin}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"description": "This request checks if the API is vulnerable to untrusted origins. It passes Suspicious or Foreign Origin in the Headers and checks if the APIs accept the request from that Origin."
+					},
+					"response": []
+				},
+				{
+					"name": "Trusted null Origin Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"checks vulnerability with trusted null origin\", function() {",
+									"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(\"null\")",
+									"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Credentials\")).to.be.oneOf([undefined,'false'])",
+									"});",
+									"let template = `",
+									"<div style=\"align-items:center;display:flex;justify-content:center;margin-top:16px\">",
+									"  <div style=\"padding:16px; font-family:Inter, OpenSans, Helvetica, Arial, sans-serif; border:1px solid #ccc; text-align:center; vertical-align:middle; border-radius:8px;background-color:#f2f2f2\">",
+									"    <span >{{text}}</span/>",
+									"    <br/>",
+									"    <span>Learn more at <u>{{link}}</u></span>",
+									"  </div>",
+									"  </div>",
+									"  `;",
+									"  pm.visualizer.set(template, {",
+									"    text:",
+									"      'If this test fails then it means that maybe any domain can access resources or sensitive information from your domain by passing \"Origin\" as \"null\"',",
+									"      link:\"https://portswigger.net/web-security/cors\"",
+									"  });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Origin",
+								"value": "null",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"description": "This request checks if the API is vulnerable to null origin. It passes `null` in the Origin Header and checks if the API is accepting requests from `null` Origin or not. [learn more](https://portswigger.net/web-security/cors#:~:text=Whitelisted%20null%20origin%20value,Requests%20from%20serialized%20data.)"
+					},
+					"response": []
+				},
+				{
+					"name": "Trusted Unauthorised Subdomain Test",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"checks vulnerability with trusted insecure protocols\", function() {",
+									"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Origin\")).not.equal(pm.variables.get(\"sub_domain_url\"))",
+									"    pm.expect(pm.response.headers.get(\"Access-Control-Allow-Credentials\")).to.be.oneOf([undefined,'false'])",
+									"});",
+									"let template = `",
+									"<div style=\"align-items:center;display:flex;justify-content:center;margin-top:16px\">",
+									"  <div style=\"padding:16px; font-family:Inter, OpenSans, Helvetica, Arial, sans-serif; border:1px solid #ccc; text-align:center; vertical-align:middle; border-radius:8px;background-color:#f2f2f2\">",
+									"    <span >{{text}}</span/>",
+									"    <br/>",
+									"    <span>Learn more at <u>{{link}}</u></span>",
+									"  </div>",
+									"  </div>",
+									"  `;",
+									"  pm.visualizer.set(template, {",
+									"    text:",
+									"      'If this test fails then it means that maybe the API allows access to an unsecured sub domains',",
+									"      link:\"https://portswigger.net/web-security/cors\"",
+									"  });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Origin",
+								"value": "{{sub_domain_url}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"description": "This request checks if your URL trusts unsecured subdomains as origins. It passes an unsecured domain URL that can be defined in the Environment variables in the Origin Header and checks if the API is accepting requests from that subdomain or not."
+					},
+					"response": []
+				}
+			],
+			"description": "This folder contains the following request to check for the possible CORS misconfiguration in the APIs.\n- Basic origin reflection test\n- Trusted null origin test\n- Trusted unauthorised subdomain test\n\nTo learn more, visit [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)"
+		},
+		{
+			"name": "Security Headers",
+			"item": [
+				{
+					"name": "Check for Security Headers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('checks for Content-Security-Policy header', function () {",
+									"  pm.expect(pm.response.headers.get('Content-Security-Policy')).not.equal(undefined);",
+									"});",
+									"pm.test(\"checks for X-Frame-Options header\", function() {",
+									"    const header = pm.response.headers.get(\"X-Frame-Options\")||\"\"",
+									"    pm.expect(header).equal('DENY')",
+									"});",
+									"",
+									"pm.test(\"checks for Strict-Transport-Security header\", function() {",
+									"    if (['localhost', '127.0.0.1'].some(host => pm.request.url.getHost().startsWith(host))) return;",
+									"    const header = pm.response.headers.get(\"Strict-Transport-Security\")||\"\"",
+									"    pm.expect(header.toLowerCase()).contains(\"max-age\")",
+									"});",
+									"",
+									"pm.test(\"checks for X-XSS-Protection header\", function() {",
+									"    pm.expect(pm.response.headers.get(\"X-XSS-Protection\")).not.equal(undefined)",
+									"});",
+									"",
+									"",
+									"let template = `",
+									"<div style=\"align-items:center;display:flex;justify-content:center;margin-top:16px\">",
+									"  <div style=\"padding:16px; font-family:Inter, OpenSans, Helvetica, Arial, sans-serif; border:1px solid #ccc; text-align:center; vertical-align:middle; border-radius:8px;background-color:#f2f2f2\">",
+									"    <span >{{text}}</span/>",
+									"    <br/>",
+									"    <span>Learn more at <u>{{link}}</u></span>",
+									"  </div>",
+									"  </div>",
+									"  `;",
+									"  pm.visualizer.set(template, {",
+									"    text:",
+									"      'This request checks for the security headers in the response',",
+									"      link:\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers\"",
+									"  });",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"description": "This request checks for the following **Security Headers** in the **Response Headers** of the API.\n- [**Content-Security-Policy**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)\n- [**X-Frame-Options**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options)\n- [**Strict-Transport-Security**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security)\n- [**X-XSS-Protection**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection)"
+					},
+					"response": []
+				}
+			],
+			"description": "This folder contains the request to check if the API has defined proper **Security Headers** to make it more secure and reliable."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000/frontend",
+			"type": "default"
+		},
+		{
+			"key": "sub_domain_url",
+			"value": "http://foobar.localhost:5000/",
+			"type": "default"
+		},
+		{
+			"key": "malicious_origin",
+			"value": "https://evil.com",
+			"type": "default"
+		}
+	]
+}
